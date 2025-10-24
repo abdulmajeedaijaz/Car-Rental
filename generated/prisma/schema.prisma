@@ -1,0 +1,84 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  HOSTER
+  CUSTOMER
+}
+
+model user {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  username  String   @unique
+  role      Role
+  is_active Boolean  @default(true)
+  password  String
+  craetedAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model brands {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  craetedAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  models    models[]
+}
+
+model models {
+  id        String     @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  brand     brands     @relation(fields: [brandId], references: [id])
+  brandId   String     @db.ObjectId
+  craetedAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  variants  variants[]
+}
+
+model variants {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  model     models   @relation(fields: [modelId], references: [id])
+  modelId   String   @db.ObjectId
+  craetedAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model states {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  craetedAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  cities    cities[]
+}
+
+model cities {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  state     states   @relation(fields: [stateId], references: [id])
+  stateId   String   @db.ObjectId
+  craetedAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model checklist_categories {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  craetedAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model checklist_options {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  craetedAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

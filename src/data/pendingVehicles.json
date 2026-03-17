@@ -1,0 +1,78 @@
+[
+  {
+    "id": 101,
+    "owner": "Ali Rehman",
+    "brand": "Toyota",
+    "model": "Corolla",
+    "year": 2019,
+    "seats": 5,
+    "pricePerDay": 2500,
+    "status": "Approved",
+    "submittedAt": "2025-10-10",
+    "images": [
+      "https://images.unsplash.com/photo-1621007947382-bb3c3994e3fb?w=400&h=250&fit=crop"
+    ],
+    "notes": "Recently serviced. Good condition with full service history. No accidents reported.",
+    "location": "Karachi",
+    "fuelType": "Petrol",
+    "transmission": "Automatic",
+    "mileage": "45,000 km"
+  },
+  {
+    "id": 102,
+    "owner": "Sara Ahmed",
+    "brand": "Honda",
+    "model": "City",
+    "year": 2020,
+    "seats": 5,
+    "pricePerDay": 2700,
+    "status": "Approved",
+    "submittedAt": "2025-10-08",
+    "images": [
+      "https://images.unsplash.com/photo-1603584173870-7f23fdae1b7a?w=400&h=250&fit=crop"
+    ],
+    "notes": "Minor scratch on rear bumper. Regular maintenance done. All documents verified.",
+    "location": "Lahore",
+    "fuelType": "Petrol",
+    "transmission": "Automatic",
+    "mileage": "32,000 km"
+  },
+  {
+    "id": 103,
+    "owner": "Omar Khalid",
+    "brand": "Suzuki",
+    "model": "Swift",
+    "year": 2018,
+    "seats": 5,
+    "pricePerDay": 1800,
+    "status": "Pending",
+    "submittedAt": "2025-10-05",
+    "images": [
+      "https://images.unsplash.com/photo-1621135802920-133df287f89c?w=400&h=250&fit=crop"
+    ],
+    "notes": "Full service history available. New tires installed last month. Well maintained.",
+    "location": "Islamabad",
+    "fuelType": "Petrol",
+    "transmission": "Manual",
+    "mileage": "68,000 km"
+  },
+  {
+    "id": 104,
+    "owner": "Fatima Khan",
+    "brand": "Toyota",
+    "model": "Fortuner",
+    "year": 2021,
+    "seats": 7,
+    "pricePerDay": 4500,
+    "status": "Pending",
+    "submittedAt": "2025-10-03",
+    "images": [
+      "https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?w=400&h=250&fit=crop"
+    ],
+    "notes": "Premium SUV in excellent condition. All features working perfectly.",
+    "location": "Rawalpindi",
+    "fuelType": "Diesel",
+    "transmission": "Automatic",
+    "mileage": "25,000 km"
+  }
+]

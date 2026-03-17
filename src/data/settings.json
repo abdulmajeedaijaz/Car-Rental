@@ -1,0 +1,17 @@
+[
+  {
+    "name": "site_name",
+    "value": "Car Rental Admin",
+    "type": "String"
+  },
+  {
+    "name": "support_email",
+    "value": "support@taajeer.com",
+    "type": "String"
+  },
+  {
+    "name": "timezone",
+    "value": "Asia/Calcutta  ",
+    "type": "String"
+  }
+]

@@ -1,0 +1,392 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+/**
+ * ========= ENUMS =========
+ */
+enum role {
+  ADMIN
+  HOSTER
+  CUSTOMER
+}
+
+/**
+ * ========= USERS =========
+ */
+model users {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  username  String   @unique
+  role_id   role
+  is_active Boolean  @default(true)
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+/**
+ * ========= BRANDS / MODELS / VARIANTS =========
+ */
+model brands {
+  id       String     @id @default(auto()) @map("_id") @db.ObjectId
+  name     String
+  models   models[]
+  variants variants[]
+  vehicle  vehicle[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model models {
+  id       String     @id @default(auto()) @map("_id") @db.ObjectId
+  name     String
+  brand    brands     @relation(fields: [brand_id], references: [id])
+  brand_id String     @db.ObjectId
+  variants variants[]
+  vehicle  vehicle[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model variants {
+  id       String    @id @default(auto()) @map("_id") @db.ObjectId
+  name     String
+  model    models    @relation(fields: [model_id], references: [id])
+  model_id String    @db.ObjectId
+  brand    brands?   @relation(fields: [brand_id], references: [id])
+  brand_id String?   @db.ObjectId
+  vehicle  vehicle[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+/**
+ * ========= STATES / CITIES =========
+ */
+model states {
+  id        String      @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  cities    cities[]
+  customers customer[]
+  providers providers[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model cities {
+  id        String      @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  state     states      @relation(fields: [stateId], references: [id])
+  stateId   String      @db.ObjectId
+  customers customer[]
+  providers providers[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+/**
+ * ========= CHECKLIST =========
+ */
+model checklist_categories {
+  id      String              @id @default(auto()) @map("_id") @db.ObjectId
+  name    String
+  options checklist_options[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model checklist_options {
+  id                String                       @id @default(auto()) @map("_id") @db.ObjectId
+  name              String
+  category          checklist_categories         @relation(fields: [category_id], references: [id])
+  category_id       String                       @db.ObjectId
+  inspectionDetails vehicle_inspection_details[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+/**
+ * ========= VEHICLE & RELATED TABLES =========
+ */
+model vehicle {
+  id                  String   @id @default(auto()) @map("_id") @db.ObjectId
+  registration_number String   @unique
+  owner_name          String
+  insurance_company   String
+  insurance_number    String
+  chassis_number      String   @unique
+  rc_image            String
+  insurance_image     String
+  brand               brands   @relation(fields: [brand_id], references: [id])
+  brand_id            String   @db.ObjectId
+  model               models   @relation(fields: [model_id], references: [id])
+  model_id            String   @db.ObjectId
+  variant             variants @relation(fields: [variant_id], references: [id])
+  variant_id          String   @db.ObjectId
+  kms_driven          Int
+  color               String
+  mileage             Float
+  engine_capacity     Int
+
+  features             vehicle_features[]
+  images               vehicle_images[]
+  availability         vehicle_availability[]
+  availability_history vehicle_availability_history[]
+  inspections          vehicle_inspection[]
+  prices               vehicle_prices[]
+  bookings             vehicle_bookings[]
+  booking_logs         vehicle_bookings_logs[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model vehicle_features {
+  id           String  @id @default(auto()) @map("_id") @db.ObjectId
+  vehicle      vehicle @relation(fields: [vehicle_id], references: [id])
+  vehicle_id   String  @db.ObjectId
+  feature_name String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model vehicle_images {
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  vehicle     vehicle @relation(fields: [vehicle_id], references: [id])
+  vehicle_id  String  @db.ObjectId
+  image_url   String
+  description String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model vehicle_availability {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  vehicle    vehicle  @relation(fields: [vehicle_id], references: [id])
+  vehicle_id String   @db.ObjectId
+  start_time DateTime
+  end_time   DateTime
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model vehicle_availability_history {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  vehicle    vehicle  @relation(fields: [vehicle_id], references: [id])
+  vehicle_id String   @db.ObjectId
+  start_time DateTime
+  end_time   DateTime
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model vehicle_inspection {
+  id              String                       @id @default(auto()) @map("_id") @db.ObjectId
+  vehicle         vehicle                      @relation(fields: [vehicle_id], references: [id])
+  vehicle_id      String                       @db.ObjectId
+  inspection_date DateTime
+  inspector_name  String
+  details         vehicle_inspection_details[]
+
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+  vehicle_bookings   vehicle_bookings? @relation(fields: [vehicle_bookingsId], references: [id])
+  vehicle_bookingsId String?           @db.ObjectId
+}
+
+model vehicle_inspection_details {
+  id                    String             @id @default(auto()) @map("_id") @db.ObjectId
+  checklist_option      checklist_options  @relation(fields: [checklist_option_id], references: [id])
+  checklist_option_id   String             @db.ObjectId
+  rating                Int
+  description           String
+  vehicle_inspection    vehicle_inspection @relation(fields: [vehicle_inspection_id], references: [id])
+  vehicle_inspection_id String             @db.ObjectId
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model vehicle_prices {
+  id                   String                   @id @default(auto()) @map("_id") @db.ObjectId
+  vehicle              vehicle                  @relation(fields: [vehicle_id], references: [id])
+  vehicle_id           String                   @db.ObjectId
+  base_price_per_day   Float
+  hr_included          Int
+  km_included          Int
+  extra_km_charge      Float
+  extra_hr_charge      Float
+  is_unlimited_allowed Boolean                  @default(false)
+  bills                vehicle_bookings_bills[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+/**
+ * ========= USERS / CUSTOMERS / PROVIDERS =========
+ */
+model customer {
+  id                          String  @id @default(auto()) @map("_id") @db.ObjectId
+  name                        String
+  email_id                    String  @unique
+  mobile_number               String
+  alternate_mobile_number     String?
+  address                     String
+  city                        cities  @relation(fields: [city_id], references: [id])
+  city_id                     String  @db.ObjectId
+  state                       states  @relation(fields: [state_id], references: [id])
+  state_id                    String  @db.ObjectId
+  pin_code                    String
+  adhaar_number               String  @unique
+  adhar_front_image           String
+  adhar_back_image            String
+  driving_license_number      String  @unique
+  driving_license_front_image String
+  driving_license_back_image  String
+  profile_image               String?
+  is_active                   Boolean @default(true)
+
+  vehicle_bookings       vehicle_bookings[]
+  vehicle_bookings_logs  vehicle_bookings_logs[]
+  vehicle_bookings_bills vehicle_bookings_bills[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model providers {
+  id                      String  @id @default(auto()) @map("_id") @db.ObjectId
+  name                    String
+  email_id                String  @unique
+  mobile_number           String
+  alternate_mobile_number String?
+  address                 String
+  city                    cities  @relation(fields: [cityId], references: [id])
+  cityId                  String  @db.ObjectId
+  state                   states  @relation(fields: [stateId], references: [id])
+  stateId                 String  @db.ObjectId
+  pin_code                String
+  adhaar_number           String  @unique
+  adhar_front_image       String
+  adhar_back_image        String
+  pan_number              String  @unique
+  pan_image               String
+  profile_image           String?
+  is_approved             Boolean @default(false)
+  is_active               Boolean @default(true)
+  rejection_reason        String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+/**
+ * ========= BOOKINGS / LOGS / BILLS / PAYMENTS =========
+ */
+model vehicle_bookings {
+  id             String @id @default(auto()) @map("_id") @db.ObjectId
+  booking_number String @unique
+
+  vehicle    vehicle @relation(fields: [vehicle_id], references: [id])
+  vehicle_id String  @db.ObjectId
+
+  customer    customer @relation(fields: [customer_id], references: [id])
+  customer_id String   @db.ObjectId
+
+  start_time DateTime
+  end_time   DateTime
+
+  booking_status_id String? // keep as lookup id/string if you use a separate booking_status model
+
+  // one-to-many relations
+  vehicle_inspection vehicle_inspection[]
+  booking_logs       vehicle_bookings_logs[]
+  bills              vehicle_bookings_bills[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model vehicle_bookings_logs {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  // link back to vehicle (optional)
+  vehicle    vehicle? @relation(fields: [vehicle_id], references: [id])
+  vehicle_id String?  @db.ObjectId
+
+  // link to booking (optional)
+  vehicle_booking    vehicle_bookings? @relation(fields: [vehicle_booking_id], references: [id])
+  vehicle_booking_id String?           @db.ObjectId
+
+  // optionally keep booking_number as stored snapshot
+  booking_number String?
+
+  start_time DateTime
+  end_time   DateTime
+
+  customer    customer? @relation(fields: [customer_id], references: [id])
+  customer_id String?   @db.ObjectId
+
+  booking_status_id String? // lookup if you track statuses separately
+
+  logged_time DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model vehicle_bookings_bills {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  vehicle_booking    vehicle_bookings @relation(fields: [vehicle_booking_id], references: [id])
+  vehicle_booking_id String           @db.ObjectId
+
+  base_price Float
+
+  // relation to the exact price record used (vehicle_prices)
+  vehicle_price    vehicle_prices @relation(fields: [vehicle_price_id], references: [id])
+  vehicle_price_id String         @db.ObjectId
+
+  total_price     Float
+  extra_km_charge Float
+  extra_hr_charge Float
+
+  customer    customer @relation(fields: [customer_id], references: [id])
+  customer_id String   @db.ObjectId
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  bills_payment bills_payment[]
+}
+
+model bills_payment {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  bill    vehicle_bookings_bills @relation(fields: [bill_id], references: [id])
+  bill_id String                 @db.ObjectId
+
+  amount         Float
+  payment_method String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
